@@ -1,3 +1,32 @@
-# Proje Akışı
+# DİJİTAL SİMYACILAR - Proje Akışı ve Haftalık İlerleme
 
-Bu dosya proje sürecindeki haftalık ilerlemeleri takip etmek için oluşturulmuştur.
+Bu dosya, TAKIM ADI takımının haftalık proje ilerlemesini ve üyelerin görev dağılımlarını içermektedir.
+
+## 1. Hafta (6-12 Mart)
+
+**Mahmut Enes Ürek (Scrum Master / Yönetici):**
+- GitHub reposu oluşturuldu.
+- projeakisi.md dosyası oluşturuldu.
+- Takım üyeleri repo'ya davet edildi.
+- Proje iş akışı hakkında ekip bilgilendirildi.
+
+**Ekip Üyesi 1:**
+- Bu hafta yaptığı çalışmalar buraya yazılacak.
+
+**Ekip Üyesi 2:**
+- Bu hafta yaptığı çalışmalar buraya yazılacak.
+
+**Ekip Üyesi 3:**
+- Bu hafta yaptığı çalışmalar buraya yazılacak.
+
+**Ekip Üyesi 4:**
+- Bu hafta yaptığı çalışmalar buraya yazılacak.
+
+## 2. Hafta
+*(İlerleyen haftalarda doldurulacak)*
+
+## 3. Hafta
+*(İlerleyen haftalarda doldurulacak)*
+
+## 4. Hafta
+*(İlerleyen haftalarda doldurulacak)*
