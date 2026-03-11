@@ -13,7 +13,7 @@ Bu dosya, TAKIM ADI takımının haftalık proje ilerlemesini ve üyelerin göre
 **Metehan Salihoğlu:**
 - Bu hafta yaptığı çalışmalar buraya yazılacak.
 
-**Şevval Ekemen:**
+**Şevval Ekmen:**
 - Bu hafta yaptığı çalışmalar buraya yazılacak.
 
 **Enes Pepe:**
