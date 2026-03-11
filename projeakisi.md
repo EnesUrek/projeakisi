@@ -17,7 +17,10 @@ Bu dosya, TAKIM ADI takımının haftalık proje ilerlemesini ve üyelerin göre
 - Bu hafta yaptığı çalışmalar buraya yazılacak.
 
 **Enes Pepe:**
-- Bu hafta yaptığı çalışmalar buraya yazılacak.
+-Derinlemesine analizler yapıldı ve kapsamlar belirlendi 
+-Teknik gereksinimler ve fonskiyonlar derlenip raporlandı
+-İlgili sorunlar tespit edilip gerekli çözümler üretildi.
+-Github uygulamasına eklendi.
 
 **Yasir Çelik:**
 - Bu hafta yaptığı çalışmalar buraya yazılacak.
