@@ -19,8 +19,11 @@ Bu dosya, TAKIM ADI takımının haftalık proje ilerlemesini ve üyelerin göre
 **Enes Pepe:**
 
 -Derinlemesine analizler yapıldı ve kapsamlar belirlendi 
+
 -Teknik gereksinimler ve fonskiyonlar derlenip raporlandı
+
 -İlgili sorunlar tespit edilip gerekli çözümler üretildi.
+
 -Github uygulamasına eklendi.
 
 **Yasir Çelik:**
