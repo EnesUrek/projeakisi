@@ -17,6 +17,7 @@ Bu dosya, TAKIM ADI takımının haftalık proje ilerlemesini ve üyelerin göre
 - Bu hafta yaptığı çalışmalar buraya yazılacak.
 
 **Enes Pepe:**
+
 -Derinlemesine analizler yapıldı ve kapsamlar belirlendi 
 -Teknik gereksinimler ve fonskiyonlar derlenip raporlandı
 -İlgili sorunlar tespit edilip gerekli çözümler üretildi.
