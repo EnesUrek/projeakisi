@@ -10,16 +10,16 @@ Bu dosya, TAKIM ADI takımının haftalık proje ilerlemesini ve üyelerin göre
 - Takım üyeleri repo'ya davet edildi.
 - Proje iş akışı hakkında ekip bilgilendirildi.
 
-**Ekip Üyesi 1:**
+**Metehan Salihoğlu:**
 - Bu hafta yaptığı çalışmalar buraya yazılacak.
 
-**Ekip Üyesi 2:**
+**Şevval Ekemen:**
 - Bu hafta yaptığı çalışmalar buraya yazılacak.
 
-**Ekip Üyesi 3:**
+**Enes Pepe:**
 - Bu hafta yaptığı çalışmalar buraya yazılacak.
 
-**Ekip Üyesi 4:**
+**Yasir Çelik:**
 - Bu hafta yaptığı çalışmalar buraya yazılacak.
 
 ## 2. Hafta
