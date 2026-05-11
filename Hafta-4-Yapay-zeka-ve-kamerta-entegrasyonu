@@ -1,0 +1,93 @@
+import cv2
+import time
+from ultralytics import YOLO
+
+def main():
+    # Modelin yüklenmesi (Hafta 3'te geliştirildiği varsayılan temel model)
+    # Burada varsayılan olarak YOLOv8'in en hafif versiyonu (yolov8n) kullanılmıştır.
+    print("Model yükleniyor...")
+    try:
+        model = YOLO("yolov8n.pt") 
+    except Exception as e:
+        print(f"Model yüklenirken hata oluştu: {e}")
+        return
+
+    # Kamera akışını başlat (0 varsayılan web kamerasıdır)
+    cap = cv2.VideoCapture(0)
+
+    if not cap.isOpened():
+        print("Hata: Kamera açılamadı.")
+        return
+
+    print("Kamera akışı başladı. Çıkmak için 'q' tuşuna basın.")
+
+    # FPS hesaplaması için değişkenler
+    prev_time = 0
+    fps_list = []
+
+    while True:
+        # Kameradan bir kare oku
+        success, frame = cap.read()
+
+        if not success:
+            print("Kareden okuma başarısız.")
+            break
+
+        # Mevcut zamanı al
+        current_time = time.time()
+
+        # Kareyi modele besle ve tahminleri al
+        # stream=True argümanı video akışlarında bellek kullanımını optimize eder
+        results = model(frame, stream=True, verbose=False)
+
+        # Tahminleri kare üzerinde görselleştir
+        for r in results:
+            boxes = r.boxes
+            for box in boxes:
+                # Bounding box koordinatları
+                x1, y1, x2, y2 = box.xyxy[0]
+                x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+
+                # Güven skoru (doğruluk)
+                conf = float(box.conf[0])
+                
+                # Sınıf etiketi
+                cls = int(box.cls[0])
+                class_name = model.names[cls]
+
+                # Sadece %50 ve üzeri güvenilirlikteki nesneleri çiz (opsiyonel filtre)
+                if conf > 0.5:
+                    # Kutu çizimi
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    
+                    # Etiket ve doğruluk oranı çizimi
+                    label = f"{class_name} {conf:.2f}"
+                    cv2.putText(frame, label, (x1, max(y1 - 10, 0)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+        # FPS Hesaplama
+        fps = 1 / (current_time - prev_time)
+        prev_time = current_time
+        fps_list.append(fps)
+
+        # FPS'i ekrana yazdır
+        cv2.putText(frame, f"FPS: {fps:.1f}", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+
+        # Çerçeveyi göster
+        cv2.imshow("Gercek Zamanli Nesne Tanima", frame)
+
+        # 'q' tuşuna basılırsa döngüden çık
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    # Ortalama FPS hesapla
+    if len(fps_list) > 0:
+        avg_fps = sum(fps_list) / len(fps_list)
+        print(f"\n--- Performans Raporu ---")
+        print(f"Ortalama FPS: {avg_fps:.2f}")
+    
+    # Kaynakları serbest bırak
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
