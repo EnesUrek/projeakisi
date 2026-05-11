@@ -1,0 +1,83 @@
+-- Akıllı Depo Yönetim Sistemi - MySQL Veritabanı Şeması
+
+-- 1. Rol Tablosu
+CREATE TABLE IF NOT EXISTS roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255)
+);
+
+-- Örnek Roller
+INSERT IGNORE INTO roles (name, description) VALUES 
+('admin', 'Sistem Yöneticisi'),
+('depo_sorumlusu', 'Depo operasyonlarından sorumlu personel'),
+('gozlemci', 'Sadece görüntüleme yetkisi olan kullanıcı');
+
+-- 2. Kullanıcılar Tablosu
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL
+);
+
+-- 3. Ürünler Tablosu
+CREATE TABLE IF NOT EXISTS products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sku VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    width DECIMAL(10,2),
+    height DECIMAL(10,2),
+    length DECIMAL(10,2),
+    weight DECIMAL(10,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 4. Konum (Lokasyon) Tablosu
+CREATE TABLE IF NOT EXISTS locations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    section VARCHAR(50) NOT NULL,
+    shelf VARCHAR(50) NOT NULL,
+    coordinate_x DECIMAL(10,4),
+    coordinate_y DECIMAL(10,4),
+    coordinate_z DECIMAL(10,4),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 5. Anlık Envanter Tablosu
+CREATE TABLE IF NOT EXISTS inventory (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    location_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE,
+    UNIQUE KEY (product_id, location_id)
+);
+
+-- 6. Envanter Hareketleri Tablosu
+CREATE TABLE IF NOT EXISTS inventory_movements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    from_location_id INT,
+    to_location_id INT,
+    user_id INT,
+    movement_type ENUM('IN', 'OUT', 'TRANSFER') NOT NULL,
+    quantity INT NOT NULL,
+    movement_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    notes TEXT,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (from_location_id) REFERENCES locations(id) ON DELETE SET NULL,
+    FOREIGN KEY (to_location_id) REFERENCES locations(id) ON DELETE SET NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Gerekli İndeksler
+CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_products_sku ON products(sku);
+CREATE INDEX idx_inventory_movements_product ON inventory_movements(product_id);
+CREATE INDEX idx_inventory_movements_date ON inventory_movements(movement_date);
