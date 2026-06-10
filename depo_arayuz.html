@@ -513,6 +513,10 @@
     .form-grid { grid-template-columns: 1fr; }
   }
 </style>
+ Yasir-Çelik
+
+
+ main
 </head>
 <body>
 
@@ -544,7 +548,22 @@
         <span class="nav-icon">➕</span><span>Ürün Ekle</span>
       </div>
 
+ Yasir-Çelik
+      <div class="nav-item" data-page="renkler" onclick="goPage(this)">
+        <span class="nav-icon">🎨</span><span>Renk Yönetimi</span>
+      </div>
+
+      <div class="nav-item" data-page="tara" onclick="goPage(this)">
+        <span class="nav-icon">📷</span><span>Kamera Tara</span>
+      </div>
+
+      <div class="nav-item" data-page="hareketler" onclick="goPage(this)">
+        <span class="nav-icon">📋</span><span>Son Hareketler</span>
+      </div>
+
+
       <div class="nav-section-label">Sistem</div>
+ main
       <div class="nav-item" onclick="showToast('Yakında gelecek!','info','ℹ️')">
         <span class="nav-icon">📊</span><span>Raporlar</span>
       </div>
@@ -656,7 +675,96 @@
         </div>
       </div>
     </div>
+ Yasir-Çelik
+    <!-- ── PAGE: Renkler ───────────────────── -->
+<div class="page" id="page-renkler">
+  <div class="section-header">
+    <div class="section-title">Renk Yönetimi</div>
+    <button class="btn btn-primary" onclick="renkEkleModal()">＋ Yeni Renk</button>
+  </div>
 
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Renk</th>
+          <th>Önizleme</th>
+          <th>Ürün</th>
+          <th>Çarpan</th>
+          <th>Birim</th>
+          <th>İşlemler</th>
+        </tr>
+      </thead>
+      <tbody id="renk-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── Renk Düzenle Modal ───────────────── -->
+<div class="modal-overlay" id="renk-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="renk-modal-baslik">🎨 Renk Düzenle</div>
+      <div class="modal-close" onclick="closeModal('renk-modal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>RENK ADI</label>
+          <input class="form-input" id="rm-renk" placeholder="sari, mavi, kirmizi...">
+          <div class="form-hint">Küçük harf, Türkçe karakter kullanma</div>
+        </div>
+        <div class="form-group">
+          <label>ÖNİZLEME</label>
+          <input type="color" id="rm-preview"
+            style="width:100%;height:42px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);cursor:pointer">
+        </div>
+        <div class="form-group">
+          <label>ÜRÜN ADI *</label>
+          <input class="form-input" id="rm-urun" placeholder="RAM, Yumurta...">
+        </div>
+        <div class="form-group">
+          <label>ÇARPAN</label>
+          <input class="form-input" id="rm-carpan" type="number" min="1" value="1">
+          <div class="form-hint">Miktar × çarpan = gerçek stok</div>
+        </div>
+        <div class="form-group full">
+          <label>BİRİM</label>
+          <input class="form-input" id="rm-birim" placeholder="adet, karton, paket...">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('renk-modal')">İptal</button>
+      <button class="btn btn-primary" onclick="renkKaydet()">💾 Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PAGE: Hareketler ─────────────────── -->
+<div class="page" id="page-hareketler">
+  <div class="section-header">
+    <div class="section-title">Son Hareketler</div>
+    <button class="btn btn-ghost btn-sm" onclick="hareketlerYukle()">🔄 Yenile</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Ürün</th>
+          <th>Renk</th>
+          <th>Miktar</th>
+          <th>Zaman</th>
+        </tr>
+      </thead>
+      <tbody id="hareket-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+
+ main
     <!-- ── PAGE: Inventory ──────────────────── -->
     <div class="page" id="page-inventory">
       <div class="section-header">
@@ -705,6 +813,93 @@
       </div>
     </div>
 
+ Yasir-Çelik
+    <!-- ── PAGE: Tara ──────────────────────── -->
+<div class="page" id="page-tara">
+  <div class="section-header">
+    <div class="section-title">Kamera Tara</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px">
+
+    <!-- Kamera -->
+    <div class="chart-card" style="display:flex;flex-direction:column;gap:16px">
+      <h3>📷 Canlı Kamera</h3>
+      <video id="tara-video" autoplay playsinline
+        style="width:100%;border-radius:10px;border:1px solid var(--border);background:#000">
+      </video>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" id="tara-baslat-btn" onclick="kameraBaslat()">
+          ▶ Kamerayı Aç
+        </button>
+      </div>
+
+      <button class="btn btn-danger" onclick="kameraKapat()" id="tara-kapat-btn" disabled>
+      ⏹ Kamerayı Kapat
+      </button>
+
+      <div style="font-size:12px;color:var(--t3)">
+        Kamerayı açtıktan sonra etiketi kameraya tutun ve "Tara" butonuna basın.
+      </div>
+    </div>
+
+    <!-- Sonuç -->
+    <div class="chart-card" style="display:flex;flex-direction:column;gap:16px">
+      <h3>📊 Tespit Sonucu</h3>
+
+      <div id="tara-sonuc" style="flex:1">
+        <div class="empty-state" style="padding:32px 0">
+          <div class="empty-icon">🎯</div>
+          <h3>Henüz tarama yapılmadı</h3>
+          <p>Kamerayı açıp "Tara" butonuna basın</p>
+        </div>
+      </div>
+
+      <div id="tara-onay" style="display:none;flex-direction:column;gap:10px">
+        <div id="tara-onay-bilgi"
+          style="background:var(--surface2);border:1px solid var(--border);
+          border-radius:10px;padding:16px">
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-success" style="flex:1" onclick="taramaOnayla()">
+            ✅ Stoğa Ekle
+          </button>
+          <button class="btn btn-danger" onclick="taramaIptal()">
+            ✕ İptal
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Son taramalar -->
+  <div style="margin-top:20px;max-width:900px">
+    <div class="section-header">
+      <div class="section-title">Bu Oturumda Tarananlar</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ürün</th>
+            <th>Renk</th>
+            <th>Miktar</th>
+            <th>Zaman</th>
+          </tr>
+        </thead>
+        <tbody id="oturum-tbody">
+          <tr><td colspan="4" style="text-align:center;padding:24px;color:var(--t3)">
+            Henüz tarama yapılmadı
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+ main
     <!-- ── PAGE: Add ────────────────────────── -->
     <div class="page" id="page-add">
       <div class="section-header">
@@ -836,6 +1031,112 @@
 <div id="toast-container"></div>
 
 <script>
+ Yasir-Çelik
+// ── CONFIG ─────────────────────────────────────
+const API = "http://localhost:8000";
+
+// ── STATE ──────────────────────────────────────
+let products       = [];
+let filteredProducts = [];
+let currentPage    = 1;
+const PAGE_SIZE    = 8;
+let currentCat     = '';
+let currentSort    = '';
+let editingId      = null;
+let deletingId     = null;
+let searchQuery    = '';
+
+// ── API CALLS ───────────────────────────────────
+async function apiFetch(path, options = {}) {
+  const r = await fetch(API + path, {
+    headers: { "Content-Type": "application/json" },
+    ...options
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+async function apiGetAll()        { return apiFetch("/stok"); }
+async function apiGetRenkler()    { return apiFetch("/renkler"); }
+async function apiGetHareketler() { return apiFetch("/hareketler"); }
+
+async function apiCreate(payload) {
+  return apiFetch("/stok/ekle", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+async function apiDelete(id) {
+  return apiFetch(`/stok/${id}`, { method: "DELETE" });
+}
+
+async function apiRenkGuncelle(renk, payload) {
+  return apiFetch(`/renkler/${renk}`, {
+    method: "PUT",
+    body: JSON.stringify(payload)
+  });
+}
+
+// ── INIT ────────────────────────────────────────
+async function init() {
+  await loadInventory();
+  renderDashboard();
+  buildCatFilters();
+  otomatikYenile();
+  await renklerYukle();
+  await hareketlerYukle();
+}
+
+// ── OTOMATİK YENİLE (5 saniyede bir) ───────────
+function otomatikYenile() {
+  setInterval(async () => {
+    const data = await apiGetAll();
+    products = data.map(p => ({
+      id:       p.id,
+      name:     p.urun,
+      sku:      p.renk ? `${p.renk.slice(0,2).toUpperCase()}-${String(p.id).padStart(3,'0')}` : `UR-${String(p.id).padStart(3,'0')}`,
+      category: p.birim || "adet",
+      stock:    p.miktar,
+      minStock: 10,
+      location: "-",
+      description: "",
+      renk:     p.renk,
+      guncelleme: p.guncelleme
+    }));
+    applyFiltersAndRender(products);
+    updateStats(products);
+    renderRecentTable(products.slice(0, 5));
+    renderDashboard();
+  }, 5000);
+}
+
+// ── LOAD & RENDER ───────────────────────────────
+async function loadInventory() {
+  const data = await apiGetAll();
+  products = data.map(p => ({
+    id:       p.id,
+    name:     p.urun,
+    sku:      p.renk ? `${p.renk.slice(0,2).toUpperCase()}-${String(p.id).padStart(3,'0')}` : `UR-${String(p.id).padStart(3,'0')}`,
+    category: p.birim || "adet",
+    stock:    p.miktar,
+    minStock: 10,
+    location: "-",
+    description: "",
+    renk:     p.renk,
+    guncelleme: p.guncelleme
+  }));
+  applyFiltersAndRender(products);
+  updateStats(products);
+  renderRecentTable(products.slice(0, 5));
+}
+
+async function reloadData() {
+  showToast("Veriler yenileniyor...", "info", "🔄");
+  await loadInventory();
+  renderDashboard();
+  showToast("Veriler güncellendi", "success", "✅");
+
 // ──────────────────────────────────────────────────
 //  STATE
 // ──────────────────────────────────────────────────
@@ -939,6 +1240,7 @@ async function reloadData() {
   await loadInventory();
   renderDashboard();
   showToast('Veriler güncellendi', 'success', '✅');
+ main
 }
 
 function applyFiltersAndRender(data) {
@@ -946,6 +1248,13 @@ function applyFiltersAndRender(data) {
   if (currentCat)    d = d.filter(p => p.category === currentCat);
   if (searchQuery)   d = d.filter(p =>
     p.name.toLowerCase().includes(searchQuery) ||
+ Yasir-Çelik
+    p.sku.toLowerCase().includes(searchQuery)
+  );
+  if (currentSort === "name")       d.sort((a,b) => a.name.localeCompare(b.name));
+  if (currentSort === "stock-asc")  d.sort((a,b) => a.stock - b.stock);
+  if (currentSort === "stock-desc") d.sort((a,b) => b.stock - a.stock);
+
     p.sku.toLowerCase().includes(searchQuery)  ||
     p.category.toLowerCase().includes(searchQuery)
   );
@@ -953,13 +1262,18 @@ function applyFiltersAndRender(data) {
   if (currentSort === 'stock-asc')  d.sort((a,b) => a.stock - b.stock);
   if (currentSort === 'stock-desc') d.sort((a,b) => b.stock - a.stock);
 
+ main
   filteredProducts = d;
   currentPage = 1;
   renderTable();
 }
 
 function renderTable() {
+ Yasir-Çelik
+  const tbody = document.getElementById("inv-tbody");
+
   const tbody = document.getElementById('inv-tbody');
+ main
   const start = (currentPage - 1) * PAGE_SIZE;
   const slice = filteredProducts.slice(start, start + PAGE_SIZE);
 
@@ -967,13 +1281,32 @@ function renderTable() {
     tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
       <div class="empty-icon">📦</div>
       <h3>Ürün bulunamadı</h3>
+ Yasir-Çelik
+      <p>Henüz stok kaydı yok. Kamerayı çalıştırın.</p>
+
       <p>Arama veya filtre kriterlerini değiştirin</p>
+ main
     </div></td></tr>`;
     updatePagination();
     return;
   }
 
   tbody.innerHTML = slice.map(p => {
+ Yasir-Çelik
+    const pct = p.minStock > 0 ? Math.min(p.stock / (p.minStock * 5), 1) : 1;
+    const cls = p.stock === 0 ? "danger" : p.stock < p.minStock ? "warn" : "";
+    const pill = p.stock === 0
+      ? '<span class="status-pill empty">Tükendi</span>'
+      : p.stock < p.minStock
+      ? '<span class="status-pill low">Düşük</span>'
+      : '<span class="status-pill ok">Normal</span>';
+    const renkKutu = p.renk
+      ? `<span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:${p.renk};margin-right:6px;vertical-align:middle;border:1px solid #333"></span>`
+      : "";
+    return `<tr>
+      <td>${p.id}</td>
+      <td class="primary">${renkKutu}${p.name}</td>
+
     const pct  = p.minStock > 0 ? Math.min(p.stock / (p.minStock * 5), 1) : 1;
     const cls  = p.stock === 0 ? 'danger' : p.stock < p.minStock ? 'warn' : '';
     const pill = p.stock === 0
@@ -984,6 +1317,7 @@ function renderTable() {
     return `<tr>
       <td>${p.id}</td>
       <td class="primary">${p.name}</td>
+ main
       <td><span class="sku-badge">${p.sku}</span></td>
       <td>${p.category}</td>
       <td>
@@ -997,18 +1331,43 @@ function renderTable() {
       <td>${pill}</td>
       <td>
         <div class="action-group">
+ Yasir-Çelik
+          <button class="btn btn-danger btn-sm" onclick="openDelModal(${p.id}, '${p.name}')">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+
           <button class="btn btn-ghost btn-sm" onclick="openEditModal(${p.id})">✏️</button>
           <button class="btn btn-danger btn-sm"  onclick="openDeleteModal(${p.id})">🗑️</button>
         </div>
       </td>
     </tr>`;
   }).join('');
+ main
 
   updatePagination();
 }
 
 function updatePagination() {
   const total   = filteredProducts.length;
+ Yasir-Çelik
+  const pages   = Math.ceil(total / PAGE_SIZE);
+  const start   = (currentPage - 1) * PAGE_SIZE + 1;
+  const end     = Math.min(currentPage * PAGE_SIZE, total);
+
+  document.getElementById("page-info").textContent =
+    total ? `${start}–${end} / ${total} ürün` : "0 ürün";
+
+  document.getElementById("prev-btn").disabled = currentPage <= 1;
+  document.getElementById("next-btn").disabled = currentPage >= pages;
+
+  const nums = document.getElementById("page-numbers");
+  nums.innerHTML = "";
+  for (let i = 1; i <= pages; i++) {
+    const btn = document.createElement("button");
+    btn.className = `page-btn${i === currentPage ? " active" : ""}`;
+
   const pages   = Math.ceil(total / PAGE_SIZE) || 1;
   const start   = (currentPage - 1) * PAGE_SIZE + 1;
   const end     = Math.min(currentPage * PAGE_SIZE, total);
@@ -1023,6 +1382,7 @@ function updatePagination() {
     if (pages > 6 && i > 3 && i < pages - 1) { if (i === 4) nums.innerHTML += '<span style="color:var(--t3);padding:0 4px">…</span>'; continue; }
     const btn = document.createElement('button');
     btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+ main
     btn.textContent = i;
     btn.onclick = () => { currentPage = i; renderTable(); };
     nums.appendChild(btn);
@@ -1030,10 +1390,127 @@ function updatePagination() {
 }
 
 function changePage(dir) {
+ Yasir-Çelik
+  const pages = Math.ceil(filteredProducts.length / PAGE_SIZE);
+
   const pages = Math.ceil(filteredProducts.length / PAGE_SIZE) || 1;
+ main
   currentPage = Math.max(1, Math.min(pages, currentPage + dir));
   renderTable();
 }
+
+ Yasir-Çelik
+// ── DASHBOARD ───────────────────────────────────
+function renderDashboard() {
+  updateStats(products);
+  renderBarChart();
+  renderDonut();
+}
+
+function updateStats(data) {
+  const total = data.length;
+  const ok    = data.filter(p => p.stock >= p.minStock).length;
+  const low   = data.filter(p => p.stock > 0 && p.stock < p.minStock).length;
+  const empty = data.filter(p => p.stock === 0).length;
+
+  document.getElementById("stat-total").textContent = total;
+  document.getElementById("stat-ok").textContent    = ok;
+  document.getElementById("stat-low").textContent   = low;
+  document.getElementById("stat-empty").textContent = empty;
+
+  const badge = document.getElementById("badge-low");
+  badge.textContent = low + empty;
+  badge.style.display = (low + empty) ? "inline" : "none";
+}
+
+function renderRecentTable(data) {
+  const tbody = document.getElementById("recent-tbody");
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--t3)">
+      Henüz kayıt yok. Kamerayı çalıştırın.
+    </td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(p => {
+    const pill = p.stock === 0
+      ? '<span class="status-pill empty">Tükendi</span>'
+      : p.stock < p.minStock
+      ? '<span class="status-pill low">Düşük</span>'
+      : '<span class="status-pill ok">Normal</span>';
+    return `<tr>
+      <td class="primary">${p.name}</td>
+      <td><span class="sku-badge">${p.sku}</span></td>
+      <td>${p.category}</td>
+      <td>${p.stock}</td>
+      <td>${pill}</td>
+    </tr>`;
+  }).join("");
+}
+
+function renderBarChart() {
+  const container = document.getElementById("bar-chart");
+  if (!container) return;
+  const top7 = [...products].sort((a,b) => b.stock - a.stock).slice(0, 7);
+  const maks = Math.max(...top7.map(p => p.stock), 1);
+  container.innerHTML = top7.map(p => `
+    <div class="bar-wrap">
+      <div class="bar-col" data-val="${p.stock}"
+           style="height:${Math.round((p.stock/maks)*90)}px"></div>
+      <div class="bar-label">${p.name.split(" ")[0]}</div>
+    </div>
+  `).join("");
+}
+
+function renderDonut() {
+  const canvas = document.getElementById("donut-canvas");
+  if (!canvas) return;
+  const ctx   = canvas.getContext("2d");
+  const legend = document.getElementById("donut-legend");
+
+  const gruplar = {};
+  products.forEach(p => {
+    gruplar[p.category] = (gruplar[p.category] || 0) + p.stock;
+  });
+
+  const renkler = ["#4F8EF7","#7B5CF0","#00D4AA","#F59E0B","#EF4444","#22C55E"];
+  const keys    = Object.keys(gruplar);
+  const vals    = keys.map(k => gruplar[k]);
+  const toplam  = vals.reduce((a,b) => a+b, 0) || 1;
+
+  ctx.clearRect(0, 0, 120, 120);
+  let aci = -Math.PI / 2;
+  vals.forEach((v, i) => {
+    const dilim = (v / toplam) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(60, 60);
+    ctx.arc(60, 60, 50, aci, aci + dilim);
+    ctx.closePath();
+    ctx.fillStyle = renkler[i % renkler.length];
+    ctx.fill();
+    aci += dilim;
+  });
+
+  ctx.beginPath();
+  ctx.arc(60, 60, 28, 0, 2 * Math.PI);
+  ctx.fillStyle = "#0E1628";
+  ctx.fill();
+
+  legend.innerHTML = keys.map((k, i) => `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${renkler[i % renkler.length]}"></div>
+      <div class="legend-name">${k}</div>
+      <div class="legend-val">${gruplar[k]}</div>
+    </div>
+  `).join("");
+}
+
+// ── KATEGORİ FİLTRE ─────────────────────────────
+function buildCatFilters() {
+  const cats    = [...new Set(products.map(p => p.category))];
+  const container = document.getElementById("cat-filters");
+  container.innerHTML = `<div class="filter-chip active" data-cat="" onclick="filterCat(this)">Tümü</div>`;
+  cats.forEach(c => {
+    container.innerHTML += `<div class="filter-chip" data-cat="${c}" onclick="filterCat(this)">${c}</div>`;
 
 // ──────────────────────────────────────────────────
 //  FILTERS
@@ -1044,15 +1521,32 @@ function buildCatFilters() {
   wrap.innerHTML = `<div class="filter-chip active" data-cat="" onclick="filterCat(this)">Tümü</div>`;
   cats.forEach(cat => {
     wrap.innerHTML += `<div class="filter-chip" data-cat="${cat}" onclick="filterCat(this)">${cat}</div>`;
+ main
   });
 }
 
 function filterCat(el) {
+Yasir-Çelik
+  document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+
   document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
+ main
   currentCat = el.dataset.cat;
   applyFiltersAndRender(products);
 }
+
+ Yasir-Çelik
+function filterSort(val) {
+  currentSort = val;
+  applyFiltersAndRender(products);
+}
+
+function sortBy(field) {
+  if (field === "stock") currentSort = currentSort === "stock-asc" ? "stock-desc" : "stock-asc";
+  if (field === "name")  currentSort = "name";
+  applyFiltersAndRender(products);
 
 function filterSort(val) { currentSort = val; applyFiltersAndRender(products); }
 
@@ -1066,11 +1560,36 @@ function sortBy(key) {
   });
   currentPage = 1;
   renderTable();
+main
 }
 
 function handleSearch(val) {
   searchQuery = val.toLowerCase();
   applyFiltersAndRender(products);
+ Yasir-Çelik
+}
+
+// ── ÜRÜN EKLE (manuel) ──────────────────────────
+async function submitAdd() {
+  const name  = document.getElementById("f-name").value.trim();
+  const stock = parseInt(document.getElementById("f-stock").value);
+  const birim = document.getElementById("f-cat").value;
+
+  if (!name || isNaN(stock)) {
+    showToast("Ürün adı ve stok zorunlu!", "error", "❌");
+    return;
+  }
+
+  try {
+    await apiCreate({ urun: name, miktar: stock, birim });
+    showToast(`${name} eklendi`, "success", "✅");
+    clearAddForm();
+    await loadInventory();
+    buildCatFilters();
+    goPageDirect("inventory");
+  } catch(e) {
+    showToast("Hata: " + e.message, "error", "❌");
+
   if (val && document.getElementById('page-inventory').classList.contains('active') === false) {
     goPageDirect('inventory');
   }
@@ -1110,10 +1629,445 @@ async function submitAdd() {
     showToast('Bir hata oluştu!', 'error', '❌');
   } finally {
     btn.disabled = false; btn.textContent = '✓ Ürün Ekle';
+ main
   }
 }
 
 function clearAddForm() {
+ Yasir-Çelik
+  ["f-name","f-stock","f-desc","f-loc","f-min","f-sku"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+}
+
+// ── SİLME ───────────────────────────────────────
+function openDelModal(id, name) {
+  deletingId = id;
+  document.getElementById("del-product-name").textContent = name;
+  document.getElementById("del-modal").classList.add("open");
+}
+
+async function confirmDelete() {
+  if (!deletingId) return;
+  try {
+    await apiDelete(deletingId);
+    showToast("Ürün silindi", "success", "🗑️");
+    closeModal("del-modal");
+    await loadInventory();
+  } catch(e) {
+    showToast("Silme hatası: " + e.message, "error", "❌");
+  }
+  deletingId = null;
+}
+
+// ── MODAL ───────────────────────────────────────
+function openAddModal() { goPageDirect("add"); }
+
+function openEditModal(id) {
+  showToast("Düzenleme için ürünü silip tekrar ekleyin", "info", "ℹ️");
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove("open");
+}
+
+// ── NAVİGASYON ──────────────────────────────────
+function goPage(el) {
+  const page = el.dataset.page;
+  document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+  el.classList.add("active");
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(`page-${page}`).classList.add("active");
+
+  const titles = {
+    dashboard: ["Dashboard", "Genel bakış ve istatistikler"],
+    inventory: ["Envanter", "Tüm ürünler"],
+    add:       ["Ürün Ekle", "Manuel stok girişi"],
+    renkler:   ["Renk Yönetimi", "Renk-ürün eşleştirmeleri"],
+      hareketler: ["Son Hareketler", "Kamera tespit geçmişi"],
+          tara:       ["Kamera Tara", "Etiketi okuyup stoğa ekle"]
+    
+  };
+
+  if (titles[page]) {
+    document.getElementById("topbar-title").textContent = titles[page][0];
+    document.getElementById("topbar-sub").textContent   = titles[page][1];
+  }
+}
+
+function goPageDirect(page) {
+  const el = document.querySelector(`[data-page="${page}"]`);
+  if (el) goPage(el);
+}
+
+// ── TOAST ───────────────────────────────────────
+function showToast(msg, type = "info", icon = "ℹ️") {
+  const container = document.getElementById("toast-container");
+  const toast     = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-msg">${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+
+// ── BAŞLAT ──────────────────────────────────────
+
+// ── RENK YÖNETİMİ ───────────────────────────────
+let duzenlenenRenk = null;
+
+async function renklerYukle() {
+  const data = await apiGetRenkler();
+  const tbody = document.getElementById("renk-tbody");
+
+  const RENK_CSS = {
+    kirmizi: "#ef4444", turuncu: "#f97316", sari: "#eab308",
+    yesil: "#22c55e", acik_yesil: "#84cc16", mavi: "#3b82f6",
+    mor: "#8b5cf6", pembe: "#ec4899", beyaz: "#f1f5f9", siyah: "#1e293b"
+  };
+
+  tbody.innerHTML = Object.entries(data).map(([renk, bilgi]) => `
+    <tr>
+      <td class="primary">${renk}</td>
+      <td>
+        <div style="width:32px;height:32px;border-radius:8px;
+          background:${RENK_CSS[renk] || renk};
+          border:1px solid var(--border)">
+        </div>
+      </td>
+      <td>${bilgi.urun}</td>
+      <td><strong>${bilgi.carpan}</strong></td>
+      <td>${bilgi.birim}</td>
+      <td>
+        <div class="action-group">
+          <button class="btn btn-ghost btn-sm"
+            onclick="renkDuzenle('${renk}', '${bilgi.urun}', ${bilgi.carpan}, '${bilgi.birim}')">
+            ✏️
+          </button>
+          <button class="btn btn-danger btn-sm"
+            onclick="renkSil('${renk}')">
+            🗑️
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+}
+
+// ── KAMERA TARA ─────────────────────────────────
+let taraStream     = null;
+let taraOturumu    = [];
+let bekleyenTespit = null;
+
+const RENK_HSV = {
+  kirmizi:    { min: [0,   120,  70], max: [10,  255, 255] },
+  turuncu:    { min: [11,  120,  70], max: [25,  255, 255] },
+  sari:       { min: [26,  120,  70], max: [35,  255, 255] },
+  yesil:      { min: [36,   80,  50], max: [85,  255, 255] },
+  acik_yesil: { min: [86,   80,  50], max: [95,  255, 255] },
+  mavi:       { min: [96,  120,  70], max: [130, 255, 255] },
+  mor:        { min: [131,  80,  50], max: [155, 255, 255] },
+  pembe:      { min: [156,  80,  50], max: [170, 255, 255] },
+};
+
+function kameraKapat() {
+  if (otomatikTaraInterval) {
+    clearInterval(otomatikTaraInterval);
+    otomatikTaraInterval = null;
+  }
+  if (taraStream) {
+    taraStream.getTracks().forEach(t => t.stop());
+    taraStream = null;
+  }
+  document.getElementById("tara-video").srcObject = null;
+  document.getElementById("tara-btn").disabled = true;
+  document.getElementById("tara-kapat-btn").disabled = true;
+  document.getElementById("tara-baslat-btn").disabled = false;
+  document.getElementById("tara-baslat-btn").textContent = "▶ Kamerayı Aç";
+  taramaIptal();
+  showToast("Kamera kapatıldı", "info", "⏹");
+}
+
+let otomatikTaraInterval = null;
+
+async function kameraBaslat() {
+  try {
+    taraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+    document.getElementById("tara-video").srcObject = taraStream;
+    document.getElementById("tara-baslat-btn").disabled = true;
+    document.getElementById("tara-baslat-btn").textContent = "✅ Kamera Açık";
+    document.getElementById("tara-kapat-btn").disabled = false;
+    showToast("Kamera açıldı, otomatik tarama başladı", "success", "📷");
+
+    // Her 3 saniyede bir otomatik tara
+    otomatikTaraInterval = setInterval(async () => {
+      if (!bekleyenTespit) {
+        await manuelTara();
+      }
+    }, 3000);
+
+  } catch(e) {
+    showToast("Kamera açılamadı: " + e.message, "error", "❌");
+  }
+}
+
+function rgbToHsv(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  const d = max - min;
+  let h = 0, s = max === 0 ? 0 : d/max, v = max;
+  if (max !== min) {
+    switch(max) {
+      case r: h = ((g-b)/d + (g<b?6:0)) / 6; break;
+      case g: h = ((b-r)/d + 2) / 6; break;
+      case b: h = ((r-g)/d + 4) / 6; break;
+    }
+  }
+  return [Math.round(h*180), Math.round(s*255), Math.round(v*255)];
+}
+
+function renkTespit(imageData) {
+  const { data, width, height } = imageData;
+  const sayac = {};
+  Object.keys(RENK_HSV).forEach(r => sayac[r] = 0);
+  const toplam = width * height;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const [h, s, v] = rgbToHsv(data[i], data[i+1], data[i+2]);
+    for (const [renk, aralik] of Object.entries(RENK_HSV)) {
+      if (h >= aralik.min[0] && h <= aralik.max[0] &&
+          s >= aralik.min[1] && s <= aralik.max[1] &&
+          v >= aralik.min[2] && v <= aralik.max[2]) {
+        sayac[renk]++;
+        break;
+      }
+    }
+  }
+
+  const enFazla = Object.entries(sayac).sort((a,b) => b[1]-a[1])[0];
+  return enFazla[1] > toplam * 0.10 ? enFazla[0] : null;
+}
+
+async function manuelTara() {
+  const video  = document.getElementById("tara-video");
+  const canvas = document.createElement("canvas");
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0);
+
+  // Renk tespiti
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const renk = renkTespit(imageData);
+
+  // OCR için base64
+  const base64 = canvas.toDataURL("image/jpeg", 0.8).split(",")[1];
+
+  document.getElementById("tara-sonuc").innerHTML = `
+    <div style="text-align:center;padding:20px;color:var(--t2)">
+      <div class="spinner" style="display:inline-block"></div> Analiz ediliyor...
+    </div>`;
+
+  try {
+    const ocrSonuc = await apiFetch("/ocr", {
+    method: "POST",
+    body: JSON.stringify({ goruntu: base64 })
+  });
+    const sayi = ocrSonuc.sayi;
+
+    if (!renk || !sayi) {
+      document.getElementById("tara-sonuc").innerHTML = `
+        <div class="empty-state" style="padding:24px 0">
+          <div class="empty-icon">⚠️</div>
+          <h3>Tespit Başarısız</h3>
+          <p>${!renk ? "Renk" : "Sayı"} okunamadı. Tekrar deneyin.</p>
+        </div>`;
+      document.getElementById("tara-onay").style.display = "none";
+      return;
+    }
+
+    const renkler = await apiGetRenkler();
+    if (!renkler[renk]) {
+      showToast(`"${renk}" rengi tanımlı değil`, "error", "❌");
+      return;
+    }
+
+    const bilgi  = renkler[renk];
+    const miktar = sayi * bilgi.carpan;
+    bekleyenTespit = { renk, sayi, urun: bilgi.urun, miktar, birim: bilgi.birim };
+
+    document.getElementById("tara-sonuc").innerHTML = "";
+    document.getElementById("tara-onay").style.display = "flex";
+    document.getElementById("tara-onay-bilgi").innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--t3)">Tespit Edilen Renk</span>
+          <span style="display:flex;align-items:center;gap:6px">
+            <span style="width:14px;height:14px;border-radius:4px;
+              background:${renk};display:inline-block;border:1px solid #333"></span>
+            <strong>${renk}</strong>
+          </span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--t3)">Ürün</span>
+          <strong style="color:var(--a1)">${bilgi.urun}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--t3)">Okunan Sayı</span>
+          <strong>${sayi}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--t3)">Toplam Miktar</span>
+          <strong style="color:var(--success);font-size:18px">
+            ${miktar} ${bilgi.birim}
+          </strong>
+        </div>
+      </div>`;
+
+  } catch(e) {
+    showToast("OCR hatası: " + e.message, "error", "❌");
+  }
+}
+
+async function taramaOnayla() {
+  if (!bekleyenTespit) return;
+  const { renk, sayi } = bekleyenTespit;
+
+  try {
+    await apiFetch("/stok/kamera", {
+      method: "POST",
+      body: JSON.stringify({ renk, sayi })
+    });
+
+    const zaman = new Date().toLocaleTimeString("tr-TR");
+    taraOturumu.unshift({ ...bekleyenTespit, zaman });
+    oturumTabloGuncelle();
+
+    showToast(`${bekleyenTespit.urun} stoğa eklendi ✅`, "success", "📦");
+    taramaIptal();
+    await loadInventory();
+  } catch(e) {
+    showToast("Hata: " + e.message, "error", "❌");
+  }
+}
+
+function taramaIptal() {
+  bekleyenTespit = null;
+  document.getElementById("tara-onay").style.display = "none";
+  document.getElementById("tara-sonuc").innerHTML = `
+    <div class="empty-state" style="padding:32px 0">
+      <div class="empty-icon">🎯</div>
+      <h3>Hazır</h3>
+      <p>"Tara" butonuna basarak devam edin</p>
+    </div>`;
+}
+
+function oturumTabloGuncelle() {
+  const tbody = document.getElementById("oturum-tbody");
+  if (!taraOturumu.length) return;
+  tbody.innerHTML = taraOturumu.map(t => `
+    <tr>
+      <td class="primary">${t.urun}</td>
+      <td>
+        <span style="display:inline-flex;align-items:center;gap:6px">
+          <span style="width:10px;height:10px;border-radius:50%;
+            background:${t.renk};display:inline-block"></span>
+          ${t.renk}
+        </span>
+      </td>
+      <td><strong style="color:var(--success)">+${t.miktar} ${t.birim}</strong></td>
+      <td style="color:var(--t3);font-size:12px">${t.zaman}</td>
+    </tr>
+  `).join("");
+}
+
+// ── SON HAREKETLER ──────────────────────────────
+async function hareketlerYukle() {
+  const data = await apiGetHareketler();
+  const tbody = document.getElementById("hareket-tbody");
+
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h3>Henüz hareket yok</h3>
+      <p>Kamera bir şey tespit ettiğinde burada görünecek</p>
+    </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map(h => `
+    <tr>
+      <td>${h.id}</td>
+      <td class="primary">${h.urun}</td>
+      <td>
+        <span style="display:inline-flex;align-items:center;gap:6px">
+          <span style="width:10px;height:10px;border-radius:50%;
+            background:${h.renk || '#888'};display:inline-block"></span>
+          ${h.renk || "-"}
+        </span>
+      </td>
+      <td><strong style="color:var(--success)">+${h.miktar}</strong></td>
+      <td style="color:var(--t3);font-size:12px">${h.zaman}</td>
+    </tr>
+  `).join("");
+}
+
+function renkEkleModal() {
+  duzenlenenRenk = null;
+  document.getElementById("renk-modal-baslik").textContent = "🎨 Yeni Renk Ekle";
+  document.getElementById("rm-renk").value   = "";
+  document.getElementById("rm-urun").value   = "";
+  document.getElementById("rm-carpan").value = "1";
+  document.getElementById("rm-birim").value  = "adet";
+  document.getElementById("rm-renk").disabled = false;
+  document.getElementById("renk-modal").classList.add("open");
+}
+
+function renkDuzenle(renk, urun, carpan, birim) {
+  duzenlenenRenk = renk;
+  document.getElementById("renk-modal-baslik").textContent = `✏️ Düzenle — ${renk}`;
+  document.getElementById("rm-renk").value   = renk;
+  document.getElementById("rm-urun").value   = urun;
+  document.getElementById("rm-carpan").value = carpan;
+  document.getElementById("rm-birim").value  = birim;
+  document.getElementById("rm-renk").disabled = true;
+  document.getElementById("renk-modal").classList.add("open");
+}
+
+async function renkKaydet() {
+  const renk   = document.getElementById("rm-renk").value.trim();
+  const urun   = document.getElementById("rm-urun").value.trim();
+  const carpan = parseInt(document.getElementById("rm-carpan").value);
+  const birim  = document.getElementById("rm-birim").value.trim();
+
+  if (!renk || !urun || !birim || isNaN(carpan)) {
+    showToast("Tüm alanları doldurun!", "error", "❌");
+    return;
+  }
+
+  try {
+    await apiRenkGuncelle(renk, { urun, carpan, birim });
+    showToast(`${renk} güncellendi`, "success", "✅");
+    closeModal("renk-modal");
+    renklerYukle();
+  } catch(e) {
+    showToast("Hata: " + e.message, "error", "❌");
+  }
+}
+
+async function renkSil(renk) {
+  if (!confirm(`"${renk}" rengini silmek istediğinize emin misiniz?`)) return;
+  try {
+    await apiFetch(`/renkler/${renk}`, { method: "DELETE" });
+    showToast(`${renk} silindi`, "success", "🗑️");
+    renklerYukle();
+  } catch(e) {
+    showToast("Hata: " + e.message, "error", "❌");
+  }
+} 
+
+window.addEventListener("DOMContentLoaded", init);
+
   ['f-name','f-sku','f-stock','f-min','f-loc','f-desc'].forEach(id => {
     const el = document.getElementById(id);
     el.value = '';
@@ -1359,6 +2313,7 @@ function showToast(msg, type = 'info', icon = 'ℹ️') {
 //  BOOT
 // ──────────────────────────────────────────────────
 init();
+ main
 </script>
 </body>
 </html>
