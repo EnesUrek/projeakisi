@@ -1,0 +1,78 @@
+"""
+Proje: Dijital Simyacılar - Akıllı Depo Yönetim Sistemi
+Görev 5: Otomatik Uyarı ve Loglama Mekanizması
+Geliştirici: MAHMUT ENES ÜREK (Scrum Master)
+
+Açıklama: Bu modül, depo stok verilerini REST API üzerinden kontrol eder. 
+Mevcut stok miktarı, ürün için belirlenen kritik eşiğin altına düştüğünde 
+ilgili yöneticilere otomatik e-posta gönderir ve durumu sistem günlüklerine (log) kaydeder.
+"""
+
+
+import requests
+import smtplib
+from email.mime.text import MIMEText
+import datetime
+
+# --- KONFİGÜRASYON AYARLARI ---
+API_URL = "http://localhost:5000/api/v1"
+ADMIN_EMAIL = "admin@dijitalsimyacilar.com"
+SISTEM_EMAIL = "sistem@dijitalsimyacilar.com"
+EMAIL_SIFRE = "mail_sifreniz_buraya"
+
+def eposta_gonder(urun_adi, mevcut_stok, kritik_stok):
+    """Stok azaldığında yöneticiye uyarı maili atar."""
+    mesaj = f"DİKKAT: {urun_adi} adlı ürünün stoğu kritik seviyenin altına düştü!\nMevcut Stok: {mevcut_stok}\nKritik Eşik: {kritik_stok}\n\nLütfen en kısa sürede tedarik sürecini başlatınız."
+    
+    msg = MIMEText(mesaj)
+    msg['Subject'] = f"Kritik Stok Uyarısı: {urun_adi}"
+    msg['From'] = SISTEM_EMAIL
+    msg['To'] = ADMIN_EMAIL
+
+    try:
+        # Gmail SMTP sunucusu kullanılarak e-posta gönderimi (Örnek)
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(SISTEM_EMAIL, EMAIL_SIFRE)
+        server.sendmail(SISTEM_EMAIL, ADMIN_EMAIL, msg.as_string())
+        server.quit()
+        print(f"Uyarı e-postası başarıyla gönderildi -> {urun_adi}")
+    except Exception as e:
+        print(f"E-posta gönderiminde bir hata oluştu: {e}")
+
+def log_kaydet(urun_id, islem_tipi, detay):
+    """Sistemdeki hareketleri veya uyarıları veritabanına loglar."""
+    log_verisi = {
+        "urun_id": urun_id,
+        "islem_tipi": islem_tipi,
+        "degisim_miktari": 0,
+        "kamera_id": "SISTEM_OTOMASYONU",
+        "detay": detay
+    }
+    try:
+        requests.post(f"{API_URL}/loglar", json=log_verisi)
+        print(f"Sistem günlüğü (Log) oluşturuldu: {islem_tipi}")
+    except Exception as e:
+         print(f"Log kaydedilemedi: {e}")
+
+def stok_kontrol_et():
+    """Tüm ürünleri tarar ve kritik seviyedeki ürünler için aksiyon alır."""
+    try:
+        response = requests.get(f"{API_URL}/urunler")
+        if response.status_code == 200:
+            urunler = response.json()
+            
+            for urun in urunler:
+                # Mevcut stok, kritik eşikten az veya eşitse uyar!
+                if urun['miktar'] <= urun['kritik_stok']:
+                    print(f"Uyarı Tetiklendi: {urun['urun_adi']} (Stok: {urun['miktar']})")
+                    eposta_gonder(urun['urun_adi'], urun['miktar'], urun['kritik_stok'])
+                    log_kaydet(urun['id'], "UYARI", "Kritik stok seviyesine inildi.")
+    except Exception as e:
+        print(f"API'ye ulaşılamadı: {e}")
+
+# Script doğrudan çalıştırıldığında bu kısım tetiklenir
+if __name__ == "__main__":
+    print(f"--- Dijital Simyacılar Otomatik Uyarı Sistemi Başlatıldı ---")
+    print(f"Tarih/Saat: {datetime.datetime.now()}")
+    stok_kontrol_et()

@@ -513,7 +513,10 @@
     .form-grid { grid-template-columns: 1fr; }
   }
 </style>
+ Yasir-Çelik
 
+
+ main
 </head>
 <body>
 
@@ -545,6 +548,7 @@
         <span class="nav-icon">➕</span><span>Ürün Ekle</span>
       </div>
 
+ Yasir-Çelik
       <div class="nav-item" data-page="renkler" onclick="goPage(this)">
         <span class="nav-icon">🎨</span><span>Renk Yönetimi</span>
       </div>
@@ -557,6 +561,9 @@
         <span class="nav-icon">📋</span><span>Son Hareketler</span>
       </div>
 
+
+      <div class="nav-section-label">Sistem</div>
+ main
       <div class="nav-item" onclick="showToast('Yakında gelecek!','info','ℹ️')">
         <span class="nav-icon">📊</span><span>Raporlar</span>
       </div>
@@ -668,6 +675,7 @@
         </div>
       </div>
     </div>
+ Yasir-Çelik
     <!-- ── PAGE: Renkler ───────────────────── -->
 <div class="page" id="page-renkler">
   <div class="section-header">
@@ -754,6 +762,9 @@
     </table>
   </div>
 </div>
+
+
+ main
     <!-- ── PAGE: Inventory ──────────────────── -->
     <div class="page" id="page-inventory">
       <div class="section-header">
@@ -802,6 +813,7 @@
       </div>
     </div>
 
+ Yasir-Çelik
     <!-- ── PAGE: Tara ──────────────────────── -->
 <div class="page" id="page-tara">
   <div class="section-header">
@@ -886,6 +898,8 @@
   </div>
 </div>
 
+
+ main
     <!-- ── PAGE: Add ────────────────────────── -->
     <div class="page" id="page-add">
       <div class="section-header">
@@ -1017,6 +1031,7 @@
 <div id="toast-container"></div>
 
 <script>
+ Yasir-Çelik
 // ── CONFIG ─────────────────────────────────────
 const API = "http://localhost:8000";
 
@@ -1121,6 +1136,111 @@ async function reloadData() {
   await loadInventory();
   renderDashboard();
   showToast("Veriler güncellendi", "success", "✅");
+
+// ──────────────────────────────────────────────────
+//  STATE
+// ──────────────────────────────────────────────────
+let products = [];
+let filteredProducts = [];
+let currentPage = 1;
+const PAGE_SIZE = 8;
+let currentCat = '';
+let currentSort = '';
+let editingId = null;
+let deletingId = null;
+let searchQuery = '';
+
+// ──────────────────────────────────────────────────
+//  MOCK DATA (JSONPlaceholder'dan çekip zenginleştirildi)
+//  Gerçek API: https://jsonplaceholder.typicode.com/posts
+// ──────────────────────────────────────────────────
+const CATS = ['Elektronik','Mobilya','Kırtasiye','Ofis Gereçleri','Temizlik','Diğer'];
+const LOCS = ['A-01','A-05','A-12','B-03','B-07','B-11','C-02','C-08','D-04','D-09'];
+
+const productNames = [
+  'Laptop Stand Alüminyum','USB Hub 4-Port','Mekanik Klavye','Kablosuz Mouse',
+  'Monitör 24" FHD','Webcam 1080p','Mikrofon Masa Üstü','Kulaklık Noise-Cancel',
+  'Kablo Yönetim Kiti','Şarj Cihazı 65W','Ethernet Kablosu 5m','HDMI Çevirici',
+  'Ofis Koltuğu','Çalışma Masası','Dosya Dolabı','Kitaplık Metal',
+  'Silgi Set','Kalem Kutusu','Not Defteri A5','Post-it Yapışkan Not',
+  'Beyaz Tahta','Projeksiyon Perdesi','Uzatma Kablosu','Pil AA 12li',
+  'Temizlik Bezi','El Dezenfektanı','Süpürge Teli','Çöp Torbası',
+  'Kağıt A4 500 Yaprak','Toner Kartuşu','Zımba Makinesi','Delgeç'
+];
+
+function rnd(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function seedProducts() {
+  return productNames.map((name, i) => {
+    const stock = rnd(0, 150);
+    const min   = rnd(5, 20);
+    const cat   = CATS[i % CATS.length];
+    return {
+      id:       i + 1,
+      name,
+      sku:      `${cat.slice(0,2).toUpperCase()}-${String(i+1).padStart(3,'0')}`,
+      category: cat,
+      stock,
+      minStock: min,
+      location: LOCS[i % LOCS.length],
+      description: `${name} — depo envanterinde kayıtlı ürün.`,
+    };
+  });
+}
+
+// ──────────────────────────────────────────────────
+//  MOCK REST API  (JSONPlaceholder benzeri)
+// ──────────────────────────────────────────────────
+function apiGetAll() {
+  return new Promise(res => setTimeout(() => res([...products]), 420));
+}
+function apiCreate(payload) {
+  return new Promise(res => setTimeout(() => {
+    const newItem = { ...payload, id: Date.now() };
+    products.unshift(newItem);
+    res(newItem);
+  }, 520));
+}
+function apiUpdate(id, payload) {
+  return new Promise(res => setTimeout(() => {
+    const idx = products.findIndex(p => p.id === id);
+    if (idx > -1) { products[idx] = { ...products[idx], ...payload }; }
+    res(products[idx]);
+  }, 480));
+}
+function apiDelete(id) {
+  return new Promise(res => setTimeout(() => {
+    products = products.filter(p => p.id !== id);
+    res({ ok: true });
+  }, 400));
+}
+
+// ──────────────────────────────────────────────────
+//  INIT
+// ──────────────────────────────────────────────────
+async function init() {
+  products = seedProducts();
+  await loadInventory();
+  renderDashboard();
+  buildCatFilters();
+}
+
+// ──────────────────────────────────────────────────
+//  LOAD & RENDER INVENTORY
+// ──────────────────────────────────────────────────
+async function loadInventory() {
+  const data = await apiGetAll();
+  applyFiltersAndRender(data);
+  updateStats(data);
+  renderRecentTable(data.slice(0, 5));
+}
+
+async function reloadData() {
+  showToast('Veriler yenileniyor...', 'info', '🔄');
+  await loadInventory();
+  renderDashboard();
+  showToast('Veriler güncellendi', 'success', '✅');
+ main
 }
 
 function applyFiltersAndRender(data) {
@@ -1128,18 +1248,32 @@ function applyFiltersAndRender(data) {
   if (currentCat)    d = d.filter(p => p.category === currentCat);
   if (searchQuery)   d = d.filter(p =>
     p.name.toLowerCase().includes(searchQuery) ||
+ Yasir-Çelik
     p.sku.toLowerCase().includes(searchQuery)
   );
   if (currentSort === "name")       d.sort((a,b) => a.name.localeCompare(b.name));
   if (currentSort === "stock-asc")  d.sort((a,b) => a.stock - b.stock);
   if (currentSort === "stock-desc") d.sort((a,b) => b.stock - a.stock);
+
+    p.sku.toLowerCase().includes(searchQuery)  ||
+    p.category.toLowerCase().includes(searchQuery)
+  );
+  if (currentSort === 'name')       d.sort((a,b) => a.name.localeCompare(b.name));
+  if (currentSort === 'stock-asc')  d.sort((a,b) => a.stock - b.stock);
+  if (currentSort === 'stock-desc') d.sort((a,b) => b.stock - a.stock);
+
+ main
   filteredProducts = d;
   currentPage = 1;
   renderTable();
 }
 
 function renderTable() {
+ Yasir-Çelik
   const tbody = document.getElementById("inv-tbody");
+
+  const tbody = document.getElementById('inv-tbody');
+ main
   const start = (currentPage - 1) * PAGE_SIZE;
   const slice = filteredProducts.slice(start, start + PAGE_SIZE);
 
@@ -1147,13 +1281,18 @@ function renderTable() {
     tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
       <div class="empty-icon">📦</div>
       <h3>Ürün bulunamadı</h3>
+ Yasir-Çelik
       <p>Henüz stok kaydı yok. Kamerayı çalıştırın.</p>
+
+      <p>Arama veya filtre kriterlerini değiştirin</p>
+ main
     </div></td></tr>`;
     updatePagination();
     return;
   }
 
   tbody.innerHTML = slice.map(p => {
+ Yasir-Çelik
     const pct = p.minStock > 0 ? Math.min(p.stock / (p.minStock * 5), 1) : 1;
     const cls = p.stock === 0 ? "danger" : p.stock < p.minStock ? "warn" : "";
     const pill = p.stock === 0
@@ -1167,6 +1306,18 @@ function renderTable() {
     return `<tr>
       <td>${p.id}</td>
       <td class="primary">${renkKutu}${p.name}</td>
+
+    const pct  = p.minStock > 0 ? Math.min(p.stock / (p.minStock * 5), 1) : 1;
+    const cls  = p.stock === 0 ? 'danger' : p.stock < p.minStock ? 'warn' : '';
+    const pill = p.stock === 0
+      ? '<span class="status-pill empty">Tükendi</span>'
+      : p.stock < p.minStock
+        ? '<span class="status-pill low">Düşük</span>'
+        : '<span class="status-pill ok">Normal</span>';
+    return `<tr>
+      <td>${p.id}</td>
+      <td class="primary">${p.name}</td>
+ main
       <td><span class="sku-badge">${p.sku}</span></td>
       <td>${p.category}</td>
       <td>
@@ -1180,17 +1331,27 @@ function renderTable() {
       <td>${pill}</td>
       <td>
         <div class="action-group">
+ Yasir-Çelik
           <button class="btn btn-danger btn-sm" onclick="openDelModal(${p.id}, '${p.name}')">🗑️</button>
         </div>
       </td>
     </tr>`;
   }).join("");
 
+          <button class="btn btn-ghost btn-sm" onclick="openEditModal(${p.id})">✏️</button>
+          <button class="btn btn-danger btn-sm"  onclick="openDeleteModal(${p.id})">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+ main
+
   updatePagination();
 }
 
 function updatePagination() {
   const total   = filteredProducts.length;
+ Yasir-Çelik
   const pages   = Math.ceil(total / PAGE_SIZE);
   const start   = (currentPage - 1) * PAGE_SIZE + 1;
   const end     = Math.min(currentPage * PAGE_SIZE, total);
@@ -1206,6 +1367,22 @@ function updatePagination() {
   for (let i = 1; i <= pages; i++) {
     const btn = document.createElement("button");
     btn.className = `page-btn${i === currentPage ? " active" : ""}`;
+
+  const pages   = Math.ceil(total / PAGE_SIZE) || 1;
+  const start   = (currentPage - 1) * PAGE_SIZE + 1;
+  const end     = Math.min(currentPage * PAGE_SIZE, total);
+  document.getElementById('page-info').textContent =
+    total ? `${start}–${end} / ${total} ürün` : '0 ürün';
+  document.getElementById('prev-btn').disabled = currentPage <= 1;
+  document.getElementById('next-btn').disabled = currentPage >= pages;
+
+  const nums = document.getElementById('page-numbers');
+  nums.innerHTML = '';
+  for (let i = 1; i <= pages; i++) {
+    if (pages > 6 && i > 3 && i < pages - 1) { if (i === 4) nums.innerHTML += '<span style="color:var(--t3);padding:0 4px">…</span>'; continue; }
+    const btn = document.createElement('button');
+    btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+ main
     btn.textContent = i;
     btn.onclick = () => { currentPage = i; renderTable(); };
     nums.appendChild(btn);
@@ -1213,11 +1390,16 @@ function updatePagination() {
 }
 
 function changePage(dir) {
+ Yasir-Çelik
   const pages = Math.ceil(filteredProducts.length / PAGE_SIZE);
+
+  const pages = Math.ceil(filteredProducts.length / PAGE_SIZE) || 1;
+ main
   currentPage = Math.max(1, Math.min(pages, currentPage + dir));
   renderTable();
 }
 
+ Yasir-Çelik
 // ── DASHBOARD ───────────────────────────────────
 function renderDashboard() {
   updateStats(products);
@@ -1329,16 +1511,33 @@ function buildCatFilters() {
   container.innerHTML = `<div class="filter-chip active" data-cat="" onclick="filterCat(this)">Tümü</div>`;
   cats.forEach(c => {
     container.innerHTML += `<div class="filter-chip" data-cat="${c}" onclick="filterCat(this)">${c}</div>`;
+
+// ──────────────────────────────────────────────────
+//  FILTERS
+// ──────────────────────────────────────────────────
+function buildCatFilters() {
+  const cats = [...new Set(products.map(p => p.category))].sort();
+  const wrap = document.getElementById('cat-filters');
+  wrap.innerHTML = `<div class="filter-chip active" data-cat="" onclick="filterCat(this)">Tümü</div>`;
+  cats.forEach(cat => {
+    wrap.innerHTML += `<div class="filter-chip" data-cat="${cat}" onclick="filterCat(this)">${cat}</div>`;
+ main
   });
 }
 
 function filterCat(el) {
+Yasir-Çelik
   document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
   el.classList.add("active");
+
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+ main
   currentCat = el.dataset.cat;
   applyFiltersAndRender(products);
 }
 
+ Yasir-Çelik
 function filterSort(val) {
   currentSort = val;
   applyFiltersAndRender(products);
@@ -1348,11 +1547,26 @@ function sortBy(field) {
   if (field === "stock") currentSort = currentSort === "stock-asc" ? "stock-desc" : "stock-asc";
   if (field === "name")  currentSort = "name";
   applyFiltersAndRender(products);
+
+function filterSort(val) { currentSort = val; applyFiltersAndRender(products); }
+
+let sortDir = {};
+function sortBy(key) {
+  sortDir[key] = !sortDir[key];
+  filteredProducts.sort((a, b) => {
+    if (key === 'stock') return sortDir[key] ? a.stock - b.stock : b.stock - a.stock;
+    if (key === 'id')    return sortDir[key] ? a.id - b.id : b.id - a.id;
+    return sortDir[key] ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+  });
+  currentPage = 1;
+  renderTable();
+main
 }
 
 function handleSearch(val) {
   searchQuery = val.toLowerCase();
   applyFiltersAndRender(products);
+ Yasir-Çelik
 }
 
 // ── ÜRÜN EKLE (manuel) ──────────────────────────
@@ -1375,10 +1589,52 @@ async function submitAdd() {
     goPageDirect("inventory");
   } catch(e) {
     showToast("Hata: " + e.message, "error", "❌");
+
+  if (val && document.getElementById('page-inventory').classList.contains('active') === false) {
+    goPageDirect('inventory');
+  }
+}
+
+// ──────────────────────────────────────────────────
+//  ADD
+// ──────────────────────────────────────────────────
+function openAddModal() { goPageDirect('add'); }
+
+async function submitAdd() {
+  const name  = document.getElementById('f-name').value.trim();
+  const sku   = document.getElementById('f-sku').value.trim();
+  const stock = parseInt(document.getElementById('f-stock').value) || 0;
+  if (!name) { showToast('Ürün adı zorunlu!', 'error', '⚠️'); return; }
+
+  const payload = {
+    name, sku: sku || `YN-${Date.now().toString().slice(-4)}`,
+    category: document.getElementById('f-cat').value,
+    stock, minStock: parseInt(document.getElementById('f-min').value) || 10,
+    location: document.getElementById('f-loc').value || '—',
+    description: document.getElementById('f-desc').value,
+  };
+
+  const btn = document.querySelector('#page-add .btn-primary');
+  btn.disabled = true; btn.textContent = '⏳ Ekleniyor...';
+
+  try {
+    await apiCreate(payload);
+    showToast(`"${name}" eklendi!`, 'success', '✅');
+    clearAddForm();
+    await loadInventory();
+    buildCatFilters();
+    updateDashboardStats();
+    goPageDirect('inventory');
+  } catch(e) {
+    showToast('Bir hata oluştu!', 'error', '❌');
+  } finally {
+    btn.disabled = false; btn.textContent = '✓ Ürün Ekle';
+ main
   }
 }
 
 function clearAddForm() {
+ Yasir-Çelik
   ["f-name","f-stock","f-desc","f-loc","f-min","f-sku"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = "";
@@ -1811,6 +2067,253 @@ async function renkSil(renk) {
 } 
 
 window.addEventListener("DOMContentLoaded", init);
+
+  ['f-name','f-sku','f-stock','f-min','f-loc','f-desc'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+  });
+}
+
+// ──────────────────────────────────────────────────
+//  EDIT
+// ──────────────────────────────────────────────────
+function openEditModal(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  editingId = id;
+  document.getElementById('e-name').value  = p.name;
+  document.getElementById('e-sku').value   = p.sku;
+  document.getElementById('e-cat').value   = p.category;
+  document.getElementById('e-stock').value = p.stock;
+  document.getElementById('e-min').value   = p.minStock || '';
+  document.getElementById('e-loc').value   = p.location || '';
+  document.getElementById('e-desc').value  = p.description || '';
+  openModal('edit-modal');
+}
+
+async function submitEdit() {
+  const name = document.getElementById('e-name').value.trim();
+  if (!name) { showToast('Ürün adı zorunlu!', 'error', '⚠️'); return; }
+
+  const payload = {
+    name, sku: document.getElementById('e-sku').value,
+    category: document.getElementById('e-cat').value,
+    stock:    parseInt(document.getElementById('e-stock').value) || 0,
+    minStock: parseInt(document.getElementById('e-min').value)   || 10,
+    location: document.getElementById('e-loc').value,
+    description: document.getElementById('e-desc').value,
+  };
+
+  const btn = document.querySelector('#edit-modal .btn-primary');
+  btn.disabled = true; btn.textContent = '⏳ Kaydediliyor...';
+
+  try {
+    await apiUpdate(editingId, payload);
+    showToast(`"${name}" güncellendi!`, 'success', '✅');
+    closeModal('edit-modal');
+    await loadInventory();
+    updateDashboardStats();
+  } catch(e) {
+    showToast('Güncelleme başarısız!', 'error', '❌');
+  } finally {
+    btn.disabled = false; btn.textContent = '💾 Kaydet';
+  }
+}
+
+// ──────────────────────────────────────────────────
+//  DELETE
+// ──────────────────────────────────────────────────
+function openDeleteModal(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  deletingId = id;
+  document.getElementById('del-product-name').textContent = p.name;
+  openModal('del-modal');
+}
+
+async function confirmDelete() {
+  const btn = document.querySelector('#del-modal .btn-danger');
+  btn.disabled = true; btn.textContent = '⏳ Siliniyor...';
+  try {
+    await apiDelete(deletingId);
+    showToast('Ürün silindi', 'success', '🗑️');
+    closeModal('del-modal');
+    await loadInventory();
+    buildCatFilters();
+    updateDashboardStats();
+  } catch(e) {
+    showToast('Silme başarısız!', 'error', '❌');
+  } finally {
+    btn.disabled = false; btn.textContent = '🗑️ Evet, Sil';
+  }
+}
+
+// ──────────────────────────────────────────────────
+//  STATS
+// ──────────────────────────────────────────────────
+function updateStats(data) {
+  const total = data.length;
+  const empty = data.filter(p => p.stock === 0).length;
+  const low   = data.filter(p => p.stock > 0 && p.stock < p.minStock).length;
+  const ok    = total - empty - low;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-ok').textContent    = ok;
+  document.getElementById('stat-low').textContent   = low;
+  document.getElementById('stat-empty').textContent = empty;
+  document.getElementById('badge-low').textContent  = low;
+}
+
+function updateDashboardStats() { updateStats(products); }
+
+// ──────────────────────────────────────────────────
+//  DASHBOARD
+// ──────────────────────────────────────────────────
+function renderDashboard() {
+  renderBarChart();
+  renderDonut();
+}
+
+function renderBarChart() {
+  const days = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+  const vals = [38, 65, 47, 82, 70, 55, 91];
+  const max  = Math.max(...vals);
+  const wrap = document.getElementById('bar-chart');
+  wrap.innerHTML = vals.map((v, i) => `
+    <div class="bar-wrap">
+      <div class="bar-col"
+           data-val="${v} hareket"
+           style="height:${Math.round((v/max)*90)}px;
+                  ${i===6?'background:linear-gradient(180deg,var(--a3),rgba(0,212,170,.3))':''}">
+      </div>
+      <span class="bar-label">${days[i]}</span>
+    </div>`
+  ).join('');
+}
+
+function renderDonut() {
+  const canvas = document.getElementById('donut-canvas');
+  const ctx    = canvas.getContext('2d');
+  const cats   = {};
+  products.forEach(p => { cats[p.category] = (cats[p.category] || 0) + 1; });
+  const entries = Object.entries(cats).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const total   = entries.reduce((s,[,v]) => s+v, 0);
+  const colors  = ['#4F8EF7','#7B5CF0','#00D4AA','#F59E0B','#EF4444'];
+
+  ctx.clearRect(0, 0, 120, 120);
+  let angle = -Math.PI / 2;
+  const cx = 60, cy = 60, r = 50, innerR = 32;
+  entries.forEach(([,v], i) => {
+    const slice = (v / total) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, angle, angle + slice);
+    ctx.closePath();
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    angle += slice;
+  });
+  // inner hole
+  ctx.beginPath();
+  ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
+  ctx.fillStyle = getComputedStyle(document.documentElement)
+    .getPropertyValue('--surface').trim() || '#0E1628';
+  ctx.fill();
+  // center text
+  ctx.fillStyle = '#EEF2FF';
+  ctx.font = 'bold 14px Syne,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(products.length, cx, cy + 2);
+  ctx.font = '9px DM Sans,sans-serif';
+  ctx.fillStyle = '#475569';
+  ctx.fillText('ürün', cx, cy + 13);
+
+  const legend = document.getElementById('donut-legend');
+  legend.innerHTML = entries.map(([cat, v], i) => `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${colors[i]}"></div>
+      <span class="legend-name">${cat}</span>
+      <span class="legend-val">${v}</span>
+    </div>`).join('');
+}
+
+function renderRecentTable(data) {
+  document.getElementById('recent-tbody').innerHTML = data.map(p => {
+    const pill = p.stock === 0
+      ? '<span class="status-pill empty">Tükendi</span>'
+      : p.stock < p.minStock
+        ? '<span class="status-pill low">Düşük</span>'
+        : '<span class="status-pill ok">Normal</span>';
+    return `<tr>
+      <td class="primary">${p.name}</td>
+      <td><span class="sku-badge">${p.sku}</span></td>
+      <td>${p.category}</td>
+      <td style="font-weight:600">${p.stock}</td>
+      <td>${pill}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ──────────────────────────────────────────────────
+//  NAV
+// ──────────────────────────────────────────────────
+const pageMeta = {
+  dashboard: { title: 'Dashboard',    sub: 'Genel bakış ve istatistikler' },
+  inventory: { title: 'Envanter',     sub: 'Ürün listesi — ekle, düzenle, sil' },
+  add:       { title: 'Yeni Ürün',    sub: 'Envantere yeni ürün ekle' },
+};
+
+function goPage(el) {
+  const page = el.dataset.page;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  showPage(page);
+}
+
+function goPageDirect(page) {
+  const el = document.querySelector(`[data-page="${page}"]`);
+  if (el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+  showPage(page);
+}
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  const m = pageMeta[page] || {};
+  document.getElementById('topbar-title').textContent = m.title || page;
+  document.getElementById('topbar-sub').textContent   = m.sub   || '';
+}
+
+// ──────────────────────────────────────────────────
+//  MODAL
+// ──────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ──────────────────────────────────────────────────
+//  TOAST
+// ──────────────────────────────────────────────────
+function showToast(msg, type = 'info', icon = 'ℹ️') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-msg">${msg}</span>`;
+  const c = document.getElementById('toast-container');
+  c.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(20px)'; el.style.transition = '.3s'; setTimeout(() => el.remove(), 300); }, 3200);
+}
+
+// ──────────────────────────────────────────────────
+//  BOOT
+// ──────────────────────────────────────────────────
+init();
+ main
 </script>
 </body>
 </html>
